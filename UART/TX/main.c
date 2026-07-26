@@ -43,7 +43,11 @@ int main()
     *Port_C |= 0x1; //Setting the Pin High Before Transmission
 
     uint8_t data = 0xA5; //Temp Data;
-    uart_tx(data);
+    while(1)
+    {
+        uart_tx(data);
+    }
+    
 
     return 0;
 }

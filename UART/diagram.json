@@ -8,10 +8,9 @@
     { "type": "wokwi-arduino-uno", "id": "uno1", "top": 96.6, "left": -77.4, "attrs": {} }
   ],
   "connections": [
-    [ "uno1:A0", "uno:0", "green", [ "v76.7", "h387.8", "v-307.2", "h-28.8" ] ],
     [ "uno1:GND.2", "uno:GND.1", "black", [ "v38.3", "h109.5", "v-240", "h144" ] ],
     [ "logic1:GND", "uno:GND.1", "black", [ "h-9.6", "v28.8", "h240" ] ],
-    [ "uno1:A0", "logic1:D0", "purple", [ "v47.9", "h-226.6", "v-268.8", "h172.8", "v-153.6" ] ]
+    [ "logic1:D0", "uno1:A0", "green", [ "h-211.2", "v441.6", "h230.4", "v-57.6" ] ]
   ],
   "dependencies": {}
 }

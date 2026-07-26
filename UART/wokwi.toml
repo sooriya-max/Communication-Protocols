@@ -1,0 +1,4 @@
+[wokwi]
+version = 1
+firmware = "TX/tx.hex"
+elf = "TX/main.elf"

@@ -7,13 +7,13 @@
 volatile uint8_t *DDR_C = (volatile uint8_t *)0x27;     //DDR address of POrt C ; Set Direction
 volatile uint8_t *Port_C = (volatile uint8_t *)0x28;    //Port C Address        ; Set Values
 
-static inline void delay_n_cycles(uint8_t n);
+static inline void delay_n_cycles();
 
 void uart_tx(uint8_t data)
 {
     /* START BIT */
     *Port_C &= ~0x01;
-    delay_n_cycles(139);
+    delay_n_cycles();
     
     /* ACTUAL DATA */
     for(uint8_t i = 0; i < 8; i++)
@@ -26,7 +26,7 @@ void uart_tx(uint8_t data)
         {
             *Port_C &= ~(0x01);    
         }
-        delay_n_cycles(139);
+        delay_n_cycles();
         data = data >> 1;
     }
     
@@ -42,7 +42,7 @@ int main()
     
     *Port_C |= 0x1; //Setting the Pin High Before Transmission
 
-    uint8_t data = 0xA5; //Temp Data;
+    uint8_t data = 0xFE; //Temp Data;  1111 1110
     while(1)
     {
         uart_tx(data);
@@ -53,10 +53,23 @@ int main()
 }
 
 /*  DELAY BLOCK FOR EXACTLY ONE CYCLE */
-static inline void delay_n_cycles(uint8_t n)
+static inline void delay_n_cycles(void)
 {
-    while(n--)
-    {
-        NOP;
-    }
+    __asm__ __volatile__(
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 10
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 20
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 30
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 40
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 50
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 60
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 70
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 80
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 90
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 100
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 110
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 120
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"  // 130
+        "nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n nop\n"        // 139
+    );
 }
+

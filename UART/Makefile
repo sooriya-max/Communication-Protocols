@@ -14,7 +14,7 @@ rx:
 	$(CC) $(CFLAGS) RX/main.c -o RX/main.elf
 	$(OBJCOPY) -O ihex RX/main.elf RX/rx.hex
 
-
+run: tx rx
 
 
 clean:

@@ -28,6 +28,7 @@ uint8_t uart_rx(void)
         {
             data &= ~(1 << i);
         }
+
         delay_139_cycles();
     }
     if(*PIN_B & 0x01)
@@ -42,27 +43,22 @@ uint8_t uart_rx(void)
 
 int main()
 {
-    *DDR_B |= (1 << 5);   // PB5 as output
-    *Port_B |= (1 << 5);  // PB5 HIGH — onboard LED on uno1
-    while(1);
-    *DDR_D = 0xFF; //Setting the DDR of PORT D to Output for LEDs
+    
+    *DDR_B &= ~0x01;  //Setting the LSB of DDR B to Input
+    
+    *Port_B |= 0x01; //Setting the Pin High for Internal PullUp
+    
+    *DDR_D = 0xFF;
     *Port_D = 0xFF;
-    while(1);
-    // *DDR_B &= ~0x01;  //Setting the LSB of DDR B to Input
-    
-    // *Port_B |= 0x01; //Setting the Pin High for Internal PullUp
-    
-    // /*DEBUG SCENARIO*/
-    // *Port_D = 0xFF;
-    // for(volatile long i = 0; i < 1000000; i++);  // visible delay
+    for(volatile long int i = 0; i < 100000; i++);
+    while(1)
+    {
+        uint8_t data = uart_rx();
+        *Port_D = data;
 
-
-    // while(1)
-    // {
-    //     uint8_t data = uart_rx();
-    //     *Port_D = data;
+    }
     
-    // }
+    
     
 
 

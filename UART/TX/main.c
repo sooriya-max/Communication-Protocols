@@ -32,6 +32,7 @@ void uart_tx(uint8_t data)
     
     /* STOP BIT */
     *Port_C |= 0x01;
+    delay_n_cycles();
 }
 
 int main()
@@ -42,10 +43,11 @@ int main()
     
     *Port_C |= 0x1; //Setting the Pin High Before Transmission
 
-    uint8_t data = 0xFE; //Temp Data;  1111 1110
+    uint8_t data = 0xA5; //Temp Data;  1111 1110
     while(1)
     {
         uart_tx(data);
+        for(volatile long int i = 0; i < 50000; i++);
     }
     
 

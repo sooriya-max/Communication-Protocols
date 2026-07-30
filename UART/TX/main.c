@@ -7,6 +7,11 @@
 volatile uint8_t *DDR_C = (volatile uint8_t *)0x27;     //DDR address of POrt C ; Set Direction
 volatile uint8_t *Port_C = (volatile uint8_t *)0x28;    //Port C Address        ; Set Values
 
+//For switch Values;
+volatile uint8_t *DDR_D = (volatile uint8_t *)0x2A;     //DDR address of POrt D ; Set Direction
+volatile uint8_t *Port_D = (volatile uint8_t *)0x2B;    //Port D Address        ; Set Values
+volatile uint8_t *PIN_D = (volatile uint8_t *)0x29; //Initializing the PIN_B for Rx
+
 static inline void delay_n_cycles();
 
 void uart_tx(uint8_t data)
@@ -43,11 +48,36 @@ int main()
     
     *Port_C |= 0x1; //Setting the Pin High Before Transmission
 
+    //for(volatile long int i = 0; i < 50000; i++);
+
+    
+
+
     uint8_t data = 0xA5; //Temp Data;  1111 1110
+    uint8_t toggle = 0;
+
+    uart_tx(0xA5);
+
+    *DDR_D &= ~0x04;
+    *Port_D |= 0x04;
     while(1)
     {
-        uart_tx(data);
-        for(volatile long int i = 0; i < 50000; i++);
+        if(*PIN_D & (1 << 2))  // button pressed
+        {
+            if(toggle == 0)
+            {
+                uart_tx(0xA5);
+                toggle = 1;
+            }
+            else
+            {
+                uart_tx(0xFE);
+                toggle = 0;
+            }
+
+            // wait for button release before doing anything else
+            while(*PIN_D & (1 << 2));
+        }
     }
     
 

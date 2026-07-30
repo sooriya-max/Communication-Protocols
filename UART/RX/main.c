@@ -49,15 +49,14 @@ int main()
     *Port_B |= 0x01; //Setting the Pin High for Internal PullUp
     
     *DDR_D = 0xFF;
-    *Port_D = 0xFF;
-    for(volatile long int i = 0; i < 100000; i++);
+    // *Port_D = 0xFF;
+    //for(volatile long int i = 0; i < 100000; i++);
     while(1)
     {
         uint8_t data = uart_rx();
         *Port_D = data;
 
-    }
-    
+    }    
     
     
 

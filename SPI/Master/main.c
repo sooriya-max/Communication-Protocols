@@ -15,16 +15,17 @@ uint8_t spi_tx(uint8_t data)
         if(data & 0x80)
         {
             *PORTC |= 0x02;   //Setting MOSI to 1
-            *PORTC |= 0x01;   //Pulling SCK high
-            *PORTC &= ~0x01;  //Pulling SCK Low
+
         }
         else
         {
             *PORTC &= ~0x02;  //Setting MOSI to 0
-            *PORTC |= 0x01;   //Pulling SCK high
-            *PORTC &= ~0x01;  //Pulling SCK Low
+            
         }
-        if(*PINC & 0x04)    //Checking MISO bit 2 for Input
+        *PORTC |= 0x01;                     //Pulling SCK high
+        *PORTC &= ~0x01;                    //Pulling SCK Low
+        __asm__ __volatile__("nop");        //To Let the MISO Settle after the falling SCK Edge
+        if(*PINC & 0x04)                    //Checking MISO bit 2 for Input
         {
             recieved_data |= (1 << i);
         }
@@ -36,7 +37,7 @@ uint8_t spi_tx(uint8_t data)
 
 int main()
 {
-    *DDRC = 0x0B;       //SCK and MOSI, SS are 1, MISO is 0, so 0xC0 ; So setting the Direction
+    *DDRC = 0x0B;       //SCK and MOSI, SS are 1, MISO is 0, so 0x0B ; So setting the Direction
     *PORTC = 0x08;      //Setting CS as High for active low scenario
     uint8_t data = 0xA6;
     uint8_t recieved_data = 0x00;

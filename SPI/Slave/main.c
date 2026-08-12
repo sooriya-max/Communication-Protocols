@@ -7,7 +7,7 @@ volatile int8_t bit_index = 7;
 
 //FOr the Actual SPI slave bit bang
 volatile uint8_t *PIN_D = (volatile uint8_t *)0x29;
-volatile uint8_t *DDR_D = (volatile uint8_t *)0x27;
+volatile uint8_t *DDR_D = (volatile uint8_t *)0x2A;
 
 //For the LEDS
 volatile uint8_t *PORT_B = (volatile uint8_t *)0x25;
@@ -16,10 +16,12 @@ volatile uint8_t *DDR_B = (volatile uint8_t *)0x24;
 
 //Interrupt Specific
 volatile uint8_t *EICRA_INT = (volatile uint8_t *)0x69;         //FOr configuring the External Interrupts in AVR
-volatile uint8_t *EIMSK_INT = (volatile uint8_t *)0x1D;         //For Enabling the INT0
+volatile uint8_t *EIMSK_INT = (volatile uint8_t *)0x3D;         //For Enabling the INT0
 
 ISR(INT0_vect)
 {
+    if(*PIN_D & 0x20) return;   // CS is PD5 — if HIGH, slave not selected, bail
+
     if(*PIN_D & 0x08)            //CHecks if MOSI is high
     {
         recieved_data |= (1 << bit_index);

@@ -45,6 +45,7 @@ int main()
     uint8_t data = 0xA6;
     uint8_t recieved_data = 0x00;
     recieved_data = spi_tx(data);
+    while(1);
     return 0;
 }
 

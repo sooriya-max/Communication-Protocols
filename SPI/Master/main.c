@@ -64,15 +64,15 @@ int main()
     {
         /* SWITCH SELECTION LOGIC - START*/
     
-        if(!(*PIN_D & 0x01))
+        if(*PIN_D & 0x01)
         {
             slave_selection = 1;
         }
-        else if (!(*PIN_D & 0x02))
+        else if (*PIN_D & 0x02)
         {
             slave_selection = 2;
         }
-        else if (! (*PIN_D & 0x04))
+        else if (*PIN_D & 0x04)
         {
             slave_selection = 3;
         }

@@ -4,13 +4,23 @@ volatile uint8_t* PINC = (volatile uint8_t *)0x26;
 volatile uint8_t* DDRC = (volatile uint8_t *)0x27;
 volatile uint8_t* PORTC = (volatile uint8_t *)0x28;
 
+
+volatile uint8_t* PIN_D = (volatile uint8_t *)0x29;
+volatile uint8_t* DDR_D = (volatile uint8_t *)0x2A;
+
 static inline void delay_160_cycles();      //This is for Delaying the Master by 160 cycles for INterupt to service it cleanly in slave for the next bit
 
 
-uint8_t spi_tx(uint8_t data)
+uint8_t spi_tx(uint8_t data, uint8_t slave_selection)
 {
     uint8_t recieved_data = 0x00;   //setting the Recieved data to be 0
-    *PORTC &= ~0x08; //Setting the Chip Select to zero to select it
+
+    /*SLAVE Stablizing and Selcting Lines - START*/
+    *PORTC |= (0b111 << 3);  //Setting the Chip Select to one after the operations are done to deselect it
+    *PORTC &= ~(1 << (slave_selection + 2));        //This will select only the required slave meanwhile preserving the remaining ones
+    /*SLAVE Stablizing and Selcting Lines - END*/
+
+
     for(int8_t i = 7; i >= 0; i--)
     {
         if(data & 0x80)
@@ -34,18 +44,55 @@ uint8_t spi_tx(uint8_t data)
         }
         data <<= 1;
     }
-    *PORTC |= 0x08;  //Setting the Chip Select to one after the operations are done to deselect it
+    *PORTC |= (0b111 << 3);  //Setting the Chip Select to one after the operations are done to deselect it
     return recieved_data;
 }
 
 int main()
 {
-    *DDRC = 0x0B;       //SCK and MOSI, SS are 1, MISO is 0, so 0x0B ; So setting the Direction
-    *PORTC = 0x08;      //Setting CS as High for active low scenario
+    *DDRC = 0x3B;       //SCK and MOSI, SS are 1, MISO is 0, so 0x0B ; So setting the Direction //Adding two SS lines on PC4 and PC5
+    *PORTC = 0x38;      //Setting CS as High for active low scenario                            //The Added lines are set high
+
+    *DDR_D = 0x00;      //All three lines are input switches
+
+    uint8_t slave_selection = 1;
+    uint8_t prev_slave = 0;
     uint8_t data = 0xA6;
     uint8_t recieved_data = 0x00;
-    recieved_data = spi_tx(data);
-    while(1);
+
+    while(1)
+    {
+        /* SWITCH SELECTION LOGIC - START*/
+    
+        if(!(*PIN_D & 0x01))
+        {
+            slave_selection = 1;
+        }
+        else if (!(*PIN_D & 0x02))
+        {
+            slave_selection = 2;
+        }
+        else if (! (*PIN_D & 0x04))
+        {
+            slave_selection = 3;
+        }
+        else
+        {
+            slave_selection = 0;
+        }
+
+        /* SWITCH SELECTION LOGIC - END*/
+
+        if(slave_selection != 0)
+        {
+            if(prev_slave != 0)
+                spi_tx(0x00, prev_slave);
+            spi_tx(data, slave_selection);
+            prev_slave = slave_selection;
+        }
+
+        while(!(*PIN_D & 0x07));          //Wait until all SWITCHES are released
+    }
     return 0;
 }
 

@@ -18,6 +18,8 @@ volatile uint8_t *DDR_B = (volatile uint8_t *)0x24;
 volatile uint8_t *EICRA_INT = (volatile uint8_t *)0x69;         //FOr configuring the External Interrupts in AVR
 volatile uint8_t *EIMSK_INT = (volatile uint8_t *)0x3D;         //For Enabling the INT0
 
+
+/*INTERRUPT SERVICE ROUTINE For the Incoming Bit*/
 ISR(INT0_vect)
 {
     if(*PIN_D & 0x20) return;   // CS is PD5 — if HIGH, slave not selected, bail

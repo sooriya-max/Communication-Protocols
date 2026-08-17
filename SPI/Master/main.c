@@ -8,6 +8,10 @@ volatile uint8_t* PORTC = (volatile uint8_t *)0x28;
 volatile uint8_t* PIN_D = (volatile uint8_t *)0x29;
 volatile uint8_t* DDR_D = (volatile uint8_t *)0x2A;
 
+//For the LEDS
+volatile uint8_t *PORT_B = (volatile uint8_t *)0x25;
+volatile uint8_t *DDR_B = (volatile uint8_t *)0x24;
+
 static inline void delay_160_cycles();      //This is for Delaying the Master by 160 cycles for INterupt to service it cleanly in slave for the next bit
 
 
@@ -52,6 +56,7 @@ int main()
 {
     *DDRC = 0x3B;       //SCK and MOSI, SS are 1, MISO is 0, so 0x0B ; So setting the Direction //Adding two SS lines on PC4 and PC5
     *PORTC = 0x38;      //Setting CS as High for active low scenario                            //The Added lines are set high
+    *DDR_B = 0xFF;              //Setting the pins as Output for LED
 
     *DDR_D = 0x00;      //All three lines are input switches
 
@@ -87,7 +92,8 @@ int main()
         {
             if(prev_slave != 0)
                 spi_tx(0x00, prev_slave);
-            spi_tx(data, slave_selection);
+            recieved_data =  spi_tx(data, slave_selection);
+            *PORT_B = recieved_data;
             prev_slave = slave_selection;
         }
 

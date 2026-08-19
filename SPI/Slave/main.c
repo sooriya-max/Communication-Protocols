@@ -27,26 +27,21 @@ volatile uint8_t *EIMSK_INT = (volatile uint8_t *)0x3D;         //For Enabling t
 /*INTERRUPT SERVICE ROUTINE For the Incoming Bit*/
 ISR(INT0_vect)
 {
-    if(*PIN_D & 0x20) return;   // CS is PD5 — if HIGH, slave not selected, bail
+    /*DEBUG SESSION*/
+    //if(*PIN_D & 0x20) return;   // CS is PD5 — if HIGH, slave not selected, bail
+    // if(!(*PIN_D & 0x20))
+    // {
+    //     *DDR_D |= (1 << 4);
+    // }
+    // else
+    // {
+    //     *DDR_D &= ~(1 << 4);
+    //     *PORT_D &= ~(1 << 4);
+    // }
+
 
     /*CHECK if the Edge is Rising to Sample MOSI*/
     if(*PIN_D & 0x04)  // PD2 is HIGH — rising edge just fired
-    {
-        if(*PIN_D & 0x08)            //CHecks if MOSI is high
-        {
-            recieved_data |= (1 << bit_index);
-        }
-        bit_index--;
-
-        if(bit_index == -1)
-        {
-            bit_index = 7;
-            *PORT_B = recieved_data;        //Sending the Recieved data to portB for LEDs
-            recieved_data = 0x00;           //Clears for the next frame
-        }
-    }
-    /*CHECK if the Edge is Falling to send MISO*/
-    else
     {
         if(tx_data & (1 << tx_bit_index))
         {
@@ -61,6 +56,28 @@ ISR(INT0_vect)
         if(tx_bit_index == -1)
         {
             tx_bit_index = 7;
+        }
+    }
+    /*CHECK if the Edge is Falling to send MISO*/
+    else
+    {
+        
+        if(*PIN_D & 0x08)            //CHecks if MOSI is high
+        {
+            recieved_data |= (1 << bit_index);
+        }
+        else
+        {
+            recieved_data &= ~(1 << bit_index);  // explicitly clear the bit
+        }
+        
+        bit_index--;
+
+        if(bit_index == -1)
+        {
+            bit_index = 7;
+            *PORT_B = recieved_data;        //Sending the Recieved data to portB for LEDs
+            recieved_data = 0x00;           //Clears for the next frame
         }
     }
 

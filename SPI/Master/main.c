@@ -30,16 +30,17 @@ uint8_t spi_tx(uint8_t data, uint8_t slave_selection)
         if(data & 0x80)
         {
             *PORTC |= 0x02;   //Setting MOSI to 1
-            delay_160_cycles();
+            //delay_160_cycles();
 
         }
         else
         {
             *PORTC &= ~0x02;  //Setting MOSI to 0
-            delay_160_cycles();
+            //delay_160_cycles();
             
         }
         *PORTC |= 0x01;                     //Pulling SCK high
+        delay_160_cycles();
         *PORTC &= ~0x01;                    //Pulling SCK Low
         __asm__ __volatile__("nop");        //To Let the MISO Settle after the falling SCK Edge
         if(*PINC & 0x04)                    //Checking MISO bit 2 for Input
@@ -58,11 +59,14 @@ int main()
     *PORTC = 0x38;      //Setting CS as High for active low scenario                            //The Added lines are set high
     *DDR_B = 0xFF;              //Setting the pins as Output for LED
 
+    /*DEBUG*/
+    *PORT_B = 0xAA;
+
     *DDR_D = 0x00;      //All three lines are input switches
 
-    uint8_t slave_selection = 1;
+    uint8_t slave_selection = 0;
     uint8_t prev_slave = 0;
-    uint8_t data = 0xA6;
+    uint8_t data = 0xF7;
     uint8_t recieved_data = 0x00;
 
     while(1)
@@ -97,7 +101,11 @@ int main()
             prev_slave = slave_selection;
         }
 
-        while(!(*PIN_D & 0x07));          //Wait until all SWITCHES are released
+        //while((*PIN_D & 0x07));          //Wait until all SWITCHES are released
+        /*DEBUG*/
+        //for(volatile long int i = 0; i < 500000; i++);
+        while(!(*PIN_D & 0x07));   // wait for press
+        while(*PIN_D & 0x07);      // wait for release
     }
     return 0;
 }

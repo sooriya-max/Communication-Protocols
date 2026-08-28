@@ -104,7 +104,7 @@ int main()
         //while((*PIN_D & 0x07));          //Wait until all SWITCHES are released
         /*DEBUG*/
         //for(volatile long int i = 0; i < 500000; i++);
-        while(!(*PIN_D & 0x07));   // wait for press
+        //while(!(*PIN_D & 0x07));   // wait for press
         while(*PIN_D & 0x07);      // wait for release
     }
     return 0;
